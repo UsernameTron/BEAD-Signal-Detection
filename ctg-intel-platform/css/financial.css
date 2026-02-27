@@ -1,0 +1,23 @@
+/* Financial Model Module */
+.fin-wrap { padding: 24px; max-width: 1000px; margin: 0 auto; }
+.fin-subtitle { font-size: 15px; color: var(--text); margin-top: 4px; margin-bottom: 24px; }
+.fin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.fin-slider-row { margin-bottom: 20px; }
+.fin-slider-header { display: flex; justify-content: space-between; margin-bottom: 6px; }
+.fin-slider-label { font-size: 12px; color: var(--text-secondary); }
+.fin-slider-value { font-family: var(--font-mono); font-size: 14px; font-weight: 600; color: var(--accent); }
+.fin-invest-row { display: flex; justify-content: space-between; padding: 8px 0; }
+.fin-invest-label { font-size: 12px; color: var(--text-secondary); }
+.fin-invest-value { font-family: var(--font-mono); font-size: 13px; }
+.fin-roi-card { padding: 24px; text-align: center; margin-bottom: 12px; border: 1px solid var(--accent-border); background: var(--accent-dim); }
+.fin-roi-value { font-family: var(--font-mono); font-size: 56px; font-weight: 600; letter-spacing: -0.03em; color: var(--accent); line-height: 1; margin-top: 8px; }
+.fin-roi-sub { font-size: 11px; color: var(--text-muted); margin-top: 8px; }
+.fin-metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+.fin-metric-card { padding: 16px; text-align: center; }
+.fin-metric-value { font-family: var(--font-mono); font-size: 24px; font-weight: 600; margin-top: 8px; }
+.fin-metric-sub { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+.fin-total-card { padding: 16px; text-align: center; margin-bottom: 12px; }
+.fin-total-value { font-family: var(--font-mono); font-size: 36px; font-weight: 600; color: var(--text); margin-top: 8px; }
+.fin-total-sub { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+.fin-comp-bar { height: 20px; border-radius: 4px; overflow: hidden; display: flex; margin-bottom: 10px; }
+.fin-comp-legend { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-muted); }

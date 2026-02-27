@@ -1,0 +1,28 @@
+/* Strain Simulator Module */
+.ss-wrap { padding: 24px; max-width: 1000px; margin: 0 auto; }
+.ss-subtitle { font-size: 15px; color: var(--text); margin-top: 4px; margin-bottom: 24px; }
+.ss-grid { display: grid; grid-template-columns: 1fr 300px; gap: 24px; }
+.ss-slider-card { padding: 16px; margin-bottom: 10px; }
+.ss-slider-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 2px; }
+.ss-slider-label { font-size: 13px; font-weight: 500; color: var(--text); }
+.ss-slider-sub { font-size: 10px; color: var(--text-muted); margin-left: 6px; }
+.ss-slider-vals { display: flex; align-items: baseline; gap: 8px; }
+.ss-slider-display { font-family: var(--font-mono); font-size: 16px; font-weight: 600; color: var(--accent); }
+.ss-slider-score { font-family: var(--font-mono); font-size: 12px; color: var(--text-muted); }
+.ss-slider-input { margin-top: 8px; }
+.ss-presets { display: flex; gap: 8px; margin-top: 8px; }
+.ss-preset-btn {
+  flex: 1; padding: 8px 6px; border-radius: 6px; border: 1px solid var(--border);
+  background: var(--surface); color: var(--text-secondary); font-size: 10px;
+  font-weight: 500; cursor: pointer; transition: all 0.2s;
+}
+.ss-preset-btn:hover { border-color: var(--accent); color: var(--accent); }
+.ss-result-card { padding: 20px; text-align: center; margin-bottom: 12px; }
+.ss-result-score {
+  font-family: var(--font-mono); font-size: 56px; font-weight: 600;
+  letter-spacing: -0.03em; line-height: 1; margin-top: 8px;
+}
+.ss-result-tier { font-family: var(--font-mono); font-size: 14px; font-weight: 600; margin-top: 8px; letter-spacing: 0.05em; }
+.ss-result-sub { font-size: 11px; color: var(--text-muted); margin-top: 8px; }
+.ss-decision-value { font-family: var(--font-mono); font-size: 32px; font-weight: 600; color: var(--warning); margin-top: 8px; }
+.ss-action-text { font-size: 12px; color: var(--text-secondary); line-height: 1.5; }

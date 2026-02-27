@@ -1,0 +1,39 @@
+/* Deployment Roadmap Module */
+.rm-wrap { padding: 24px; }
+.rm-subtitle { font-size: 15px; color: var(--text); margin-top: 4px; margin-bottom: 24px; }
+.rm-grid { display: grid; grid-template-columns: 280px 1fr; gap: 20px; }
+.rm-phase-btn {
+  width: 100%; padding: 16px; margin-bottom: 10px; border-radius: 8px;
+  border: 1px solid var(--border); background: var(--surface);
+  text-align: left; cursor: pointer; transition: all 0.2s;
+}
+.rm-phase-btn.active { border-color: var(--accent); background: var(--accent-dim); }
+.rm-phase-btn-inner { display: flex; align-items: center; gap: 10px; }
+.rm-phase-num {
+  width: 28px; height: 28px; border-radius: 50%; display: flex;
+  align-items: center; justify-content: center; border: 2px solid var(--border);
+  font-family: var(--font-mono); font-size: 12px; font-weight: 600; color: var(--text-muted);
+}
+.rm-phase-btn.active .rm-phase-num { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+.rm-phase-name { font-size: 13px; font-weight: 500; color: var(--text); }
+.rm-phase-btn.active .rm-phase-name { color: var(--accent); }
+.rm-phase-weeks { font-size: 10px; color: var(--text-muted); }
+.rm-ask-card { padding: 16px; margin-top: 8px; border-left: 3px solid var(--accent); background: var(--accent-dim); }
+.rm-ask-text { font-size: 12px; color: var(--text); font-weight: 500; line-height: 1.5; }
+.rm-detail-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.rm-detail-title { font-family: var(--font-mono); font-size: 20px; font-weight: 600; color: var(--accent); }
+.rm-detail-weeks { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+.rm-status-badge {
+  padding: 4px 10px; border-radius: 4px; font-size: 10px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.05em;
+}
+.rm-task-item { padding: 14px; margin-bottom: 8px; border-radius: 6px; background: var(--bg); border: 1px solid var(--border); }
+.rm-task-name { font-size: 13px; color: var(--text); font-weight: 500; margin-bottom: 4px; }
+.rm-task-meta { display: flex; justify-content: space-between; font-size: 11px; }
+.rm-task-output-label { color: var(--text-muted); }
+.rm-task-output-value { color: var(--accent); }
+.rm-task-effort { font-family: var(--font-mono); color: var(--text-muted); }
+.rm-summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.rm-summary-card { padding: 16px; text-align: center; }
+.rm-summary-value { font-family: var(--font-mono); font-size: 14px; font-weight: 500; color: var(--text); margin-top: 6px; }
+.rm-summary-deliverable { font-size: 12px; font-weight: 500; color: var(--accent); margin-top: 6px; line-height: 1.4; }

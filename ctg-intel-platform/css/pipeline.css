@@ -1,0 +1,42 @@
+/* Pipeline Intelligence Module */
+.pl-grid { display: grid; gap: 0; height: calc(100vh - 60px); }
+.pl-grid.with-panel { grid-template-columns: 1fr 380px; }
+.pl-grid.no-panel { grid-template-columns: 1fr; }
+.pl-list { padding: 24px; overflow-y: auto; }
+.pl-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.pl-header-info { font-size: 15px; color: var(--text); margin-top: 4px; }
+.pl-card { padding: 16px; margin-bottom: 8px; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
+.pl-card-top { display: flex; justify-content: space-between; align-items: center; }
+.pl-card-left { display: flex; align-items: center; gap: 12px; }
+.pl-score-circle {
+  width: 40px; height: 40px; border-radius: 50%; display: flex;
+  align-items: center; justify-content: center; border-width: 2px; border-style: solid;
+}
+.pl-card-name { font-size: 14px; font-weight: 500; color: var(--text); }
+.pl-card-meta { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+.pl-card-award { font-family: var(--font-mono); font-size: 16px; font-weight: 600; color: var(--accent); }
+.pl-card-locs { font-size: 10px; color: var(--text-muted); }
+.pl-card-notes { margin-top: 10px; font-size: 12px; color: var(--text-secondary); line-height: 1.4; }
+
+/* Detail Panel */
+.pl-panel { border-left: 1px solid var(--border); background: var(--surface); overflow-y: auto; padding: 20px; }
+.pl-panel-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
+.pl-panel-name { font-size: 16px; font-weight: 500; }
+.pl-close-btn {
+  background: transparent; border: 1px solid var(--border); color: var(--text-muted);
+  width: 28px; height: 28px; border-radius: 4px; cursor: pointer; font-size: 14px;
+}
+.pl-score-box { background: var(--bg); border-radius: 8px; padding: 16px; border: 1px solid var(--border); margin-bottom: 16px; text-align: center; }
+.pl-factor-row { margin-bottom: 8px; }
+.pl-factor-header { display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 3px; }
+.pl-factor-label { color: var(--text-secondary); }
+.pl-factor-value { font-family: var(--font-mono); color: var(--accent); font-weight: 500; }
+.pl-service-item {
+  padding: 6px 10px; margin-bottom: 4px; border-radius: 4px;
+  background: var(--bg); border: 1px solid var(--border);
+  font-size: 11px; color: var(--text-secondary); display: flex; align-items: center; gap: 8px;
+}
+.pl-decision-box { margin-top: 16px; padding: 12px; border-radius: 6px; }
+.pl-intel-box { margin-top: 16px; padding: 12px; border-radius: 6px; border-left: 3px solid var(--accent); background: var(--bg); }
+.pl-intel-row { font-size: 12px; color: var(--text-secondary); line-height: 1.5; }
+.pl-intel-key { color: var(--text); font-weight: 500; }

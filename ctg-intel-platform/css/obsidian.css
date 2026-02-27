@@ -1,0 +1,75 @@
+/* ═══════════════════════════════════════════════════════════════
+   OBSIDIAN DESIGN SYSTEM — Design Tokens
+   Bloomberg Terminal × Swiss Editorial
+   ═══════════════════════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root {
+  /* ─── Backgrounds ─── */
+  --bg:            #09090b;
+  --surface:       #111113;
+  --surface-alt:   #18181b;
+
+  /* ─── Borders ─── */
+  --border:        #27272a;
+  --border-light:  #1e1e22;
+
+  /* ─── Text ─── */
+  --text:          #fafafa;
+  --text-secondary:#a1a1aa;
+  --text-muted:    #71717a;
+
+  /* ─── Accent (Primary Green) ─── */
+  --accent:        #34d399;
+  --accent-dim:    rgba(52,211,153,0.08);
+  --accent-border: rgba(52,211,153,0.25);
+
+  /* ─── Tier Colors ─── */
+  --hot:           #ef4444;
+  --hot-dim:       rgba(239,68,68,0.1);
+  --warm:          #f59e0b;
+  --warm-dim:      rgba(245,158,11,0.1);
+  --nurture:       #3b82f6;
+  --nurture-dim:   rgba(59,130,246,0.1);
+  --strategic:     #a78bfa;
+  --strategic-dim: rgba(167,139,250,0.1);
+
+  /* ─── Status Colors ─── */
+  --success:       #4ade80;
+  --warning:       #fbbf24;
+  --error:         #ef4444;
+
+  /* ─── Agent Colors ─── */
+  --scout:         #34d399;
+  --analyst:       #3b82f6;
+  --strategist:    #a78bfa;
+  --planner:       #f59e0b;
+  --monitor:       #ef4444;
+
+  /* ─── Typography ─── */
+  --font-mono:     "JetBrains Mono","Geist Mono","SF Mono",monospace;
+  --font-sans:     "Plus Jakarta Sans","Satoshi","Geist",system-ui,sans-serif;
+}
+
+/* ═══ Reset & Base ═══ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; width: 100%; overflow: hidden; font-family: var(--font-sans); background: var(--bg); color: var(--text); }
+
+/* ═══ Scrollbar ═══ */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+/* ═══ Range Input ═══ */
+input[type="range"] { -webkit-appearance: none; appearance: none; outline: none; width: 100%; height: 4px; background: var(--border); border-radius: 2px; cursor: pointer; }
+input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--accent); cursor: pointer; border: 2px solid var(--bg); box-shadow: 0 0 0 1px var(--accent); }
+
+/* ═══ Animations ═══ */
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ═══ Interactive Defaults ═══ */
+button { font-family: inherit; }
+button:hover { opacity: 0.85; }

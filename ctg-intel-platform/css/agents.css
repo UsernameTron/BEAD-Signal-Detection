@@ -1,0 +1,43 @@
+/* Agent Architecture Module */
+.ag-wrap { padding: 24px; }
+.ag-subtitle { font-size: 15px; color: var(--text); margin-top: 4px; margin-bottom: 24px; }
+.ag-grid { display: grid; grid-template-columns: 1fr 400px; gap: 20px; }
+.ag-card { padding: 0; margin-bottom: 10px; overflow: hidden; border-left-width: 3px; border-left-style: solid; }
+.ag-card-inner { padding: 14px 16px; }
+.ag-card-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.ag-card-name { font-family: var(--font-mono); font-size: 13px; font-weight: 600; letter-spacing: 0.05em; }
+.ag-card-sub { font-size: 11px; color: var(--text-muted); font-style: italic; }
+.ag-card-active { display: flex; align-items: center; gap: 4px; }
+.ag-card-active-dot { width: 6px; height: 6px; border-radius: 50%; animation: pulse 1s infinite; display: inline-block; }
+.ag-card-active-text { font-size: 9px; font-weight: 500; }
+.ag-card-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 10px; }
+.ag-card-meta { display: flex; gap: 16px; font-size: 10px; }
+.ag-card-meta-label { color: var(--text-muted); }
+.ag-card-meta-value { color: var(--text-secondary); }
+.ag-card-outputs { font-size: 10px; margin-top: 4px; }
+.ag-card-outputs-label { color: var(--text-muted); }
+.ag-run-btn {
+  width: 100%; padding: 14px; border-radius: 8px; border: 1px solid var(--accent);
+  background: var(--accent-dim); color: var(--accent);
+  font-family: var(--font-mono); font-size: 13px; font-weight: 600;
+  cursor: pointer; margin-top: 8px; letter-spacing: 0.05em; transition: all 0.3s;
+}
+.ag-run-btn:disabled { border-color: var(--border); background: var(--surface); color: var(--text-muted); cursor: default; }
+.ag-log-wrap { padding: 0; overflow: hidden; position: sticky; top: 24px; }
+.ag-log-header {
+  padding: 14px 16px; border-bottom: 1px solid var(--border);
+  display: flex; justify-content: space-between; align-items: center;
+}
+.ag-log-processing { display: flex; align-items: center; gap: 4px; }
+.ag-log-processing-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--error); animation: pulse 0.8s infinite; display: inline-block; }
+.ag-log-processing-text { font-size: 10px; color: var(--error); font-weight: 500; }
+.ag-log-list { max-height: 500px; overflow-y: auto; }
+.ag-log-empty { padding: 40px; text-align: center; color: var(--text-muted); font-size: 12px; }
+.ag-log-entry { padding: 10px 16px; border-bottom: 1px solid var(--border-light); animation: fadeIn 0.3s ease; }
+.ag-log-entry-header { display: flex; align-items: center; gap: 6px; margin-bottom: 3px; }
+.ag-log-entry-agent {
+  font-size: 9px; font-weight: 600; padding: 2px 6px; border-radius: 3px;
+  letter-spacing: 0.05em; background: rgba(128,128,128,0.1);
+}
+.ag-log-entry-time { font-family: var(--font-mono); font-size: 9px; color: var(--text-muted); }
+.ag-log-entry-text { font-size: 11px; color: var(--text-secondary); line-height: 1.4; }
