@@ -1,0 +1,1040 @@
+import { useState, useEffect, useCallback, useMemo } from "react";
+
+// ═══════════════════════════════════════════════════════════════
+// BEAD PARTNER INTELLIGENCE PLATFORM — Strategic Operating System
+// Author: Pete Connor | Director, Technical Center Operations
+// Design System: Obsidian (Bloomberg Terminal × Swiss Editorial)
+// ═══════════════════════════════════════════════════════════════
+
+const c = {
+  bg: '#09090b', surface: '#111113', surfaceAlt: '#18181b',
+  border: '#27272a', borderLight: '#1e1e22',
+  text: '#fafafa', textSecondary: '#a1a1aa', textMuted: '#71717a',
+  accent: '#34d399', accentDim: 'rgba(52,211,153,0.08)', accentBorder: 'rgba(52,211,153,0.25)',
+  hot: '#ef4444', hotDim: 'rgba(239,68,68,0.1)',
+  warm: '#f59e0b', warmDim: 'rgba(245,158,11,0.1)',
+  nurture: '#3b82f6', nurtureDim: 'rgba(59,130,246,0.1)',
+  strategic: '#a78bfa', strategicDim: 'rgba(167,139,250,0.1)',
+  success: '#4ade80', warning: '#fbbf24', error: '#ef4444',
+  scout: '#34d399', analyst: '#3b82f6', strategist: '#a78bfa', planner: '#f59e0b', monitor: '#ef4444',
+};
+
+const mono = '"JetBrains Mono","Geist Mono","SF Mono",monospace';
+const sans = '"Plus Jakarta Sans","Satoshi","Geist",system-ui,sans-serif';
+
+const PROSPECTS = [
+  { id:1, name:"Wisper ISP", state:"MO", award:350264521, locs:37140, tech:"Fiber/FWA", ceo:"Nathan Stooke", contact:"verified", tier:"hot", founded:"2003", subs:45000, notes:"Largest MO BEAD recipient. FWA-to-fiber transition.", gvi:0.83, oms:3, ttc:2, wsi:18, dtp:13, sqds:5, decisionMonth:"2026-09", services:["Tier 1 Support","NOC","BSS/OSS Integration","BEAD Compliance","Network Monitoring"] },
+  { id:2, name:"Strategic Mgmt LLC", state:"Multi", award:268100000, locs:28400, tech:"Fiber", ceo:"Undisclosed", contact:"regulatory", tier:"hot", founded:"2019", subs:2000, notes:"Multi-state fiber builder. Thin org structure for scale.", gvi:14.2, oms:2, ttc:1, wsi:16, dtp:14, sqds:3, decisionMonth:"2026-07", services:["Full Operations","Subscriber Mgmt","Compliance","Field Dispatch","Billing Platform"] },
+  { id:3, name:"SkyFiber Inc", state:"NV", award:181000000, locs:15600, tech:"FWA→Fiber", ceo:"Mark Feest", contact:"linkedin", tier:"hot", founded:"2009", subs:8000, notes:"Nevada's largest BEAD winner. FWA converting to fiber—needs dual-platform BSS/OSS.", gvi:1.95, oms:3, ttc:2.5, wsi:14, dtp:12, sqds:4, decisionMonth:"2026-11", services:["BSS/OSS Integration","Tier 1 Support","NOC","Tech Transition Support","BEAD Compliance"] },
+  { id:4, name:"Stimulus Technologies", state:"NV", award:142000000, locs:12100, tech:"Fiber", ceo:"Adam Dawson", contact:"verified", tier:"hot", founded:"2005", subs:3500, notes:"MSP pivoting to ISP. Strong tech DNA, no subscriber ops experience.", gvi:3.46, oms:2, ttc:1.5, wsi:15, dtp:11, sqds:2, decisionMonth:"2026-10", services:["Subscriber Operations","Helpdesk","Billing","BEAD Compliance","Workforce Training"] },
+  { id:5, name:"Maverix Broadband", state:"CO", award:103018133, locs:10232, tech:"Fiber", ceo:"TBD", contact:"website", tier:"hot", founded:"2021", subs:0, notes:"Greenfield fiber builder. Zero existing ops. Needs everything.", gvi:99, oms:1, ttc:3, wsi:20, dtp:14, sqds:0, decisionMonth:"2026-06", services:["Full Managed Services","BSS/OSS Build","NOC","Tier 1-3 Support","BEAD Compliance"] },
+  { id:6, name:"IdeaTek Telcom", state:"KS", award:87500000, locs:9800, tech:"Fiber", ceo:"Daniel Friesen", contact:"verified", tier:"warm", founded:"2007", subs:12000, notes:"Established Kansas ISP. Growing but has some operational maturity.", gvi:0.82, oms:3, ttc:1, wsi:10, dtp:10, sqds:3, decisionMonth:"2027-02", services:["Tier 1 Support","Overflow Handling","BEAD Compliance","After-Hours NOC"] },
+  { id:7, name:"Visionary Communications", state:"CO", award:76200000, locs:7500, tech:"Fiber", ceo:"Jim Baum", contact:"conference", tier:"warm", founded:"1996", subs:22000, notes:"Mature telco. Needs capacity for BEAD subscriber surge.", gvi:0.34, oms:4, ttc:1, wsi:8, dtp:9, sqds:6, decisionMonth:"2027-04", services:["Overflow Support","BEAD Compliance","After-Hours Coverage","Seasonal Scaling"] },
+  { id:8, name:"White Cloud Comm", state:"ID", award:64300000, locs:6200, tech:"Fiber/FWA", ceo:"Janet Roberts", contact:"linkedin", tier:"warm", founded:"2020", subs:1800, notes:"Young Idaho ISP. Dual-technology deployment.", gvi:3.44, oms:2, ttc:2, wsi:12, dtp:11, sqds:2, decisionMonth:"2026-12", services:["Full Operations","BSS/OSS","Tier 1 Support","Network Monitoring","BEAD Compliance"] },
+  { id:9, name:"Pine Telephone Co", state:"OK", award:52800000, locs:5400, tech:"Fiber", ceo:"Tom Winn", contact:"verified", tier:"warm", founded:"1953", subs:9500, notes:"Legacy telco upgrading to fiber. Strong local roots.", gvi:0.57, oms:4, ttc:1.5, wsi:7, dtp:8, sqds:4, decisionMonth:"2027-06", services:["Tech Support Augmentation","BEAD Compliance","After-Hours NOC"] },
+  { id:10, name:"Nuvera Communications", state:"MN", award:48700000, locs:4800, tech:"Fiber", ceo:"Glenn Zerbe", contact:"conference", tier:"warm", founded:"2009", subs:14000, notes:"Minnesota fiber provider. Moderate growth trajectory.", gvi:0.34, oms:4, ttc:1, wsi:6, dtp:8, sqds:3, decisionMonth:"2027-08", services:["Overflow Support","BEAD Compliance"] },
+  { id:11, name:"Valley Electric Assn", state:"NV", award:41200000, locs:3900, tech:"Fiber", ceo:"Angela Evans", contact:"regulatory", tier:"nurture", founded:"1965", subs:7200, notes:"Electric co-op entering broadband. Zero telecom ops experience.", gvi:0.54, oms:2, ttc:2, wsi:9, dtp:9, sqds:1, decisionMonth:"2027-03", services:["Full Operations Build","Training","BSS/OSS","NOC"] },
+  { id:12, name:"Citizens Telephone Co", state:"VA", award:38500000, locs:3600, tech:"Fiber", ceo:"Greg Sapp", contact:"verified", tier:"nurture", founded:"1914", subs:11000, notes:"110-year-old telco. Conservative operations culture.", gvi:0.33, oms:4, ttc:1, wsi:4, dtp:7, sqds:5, decisionMonth:"2027-10", services:["BEAD Compliance","After-Hours Support"] },
+  { id:13, name:"Consolidated Telcom", state:"ND", award:35100000, locs:3200, tech:"Fiber", ceo:"Paul Schutt", contact:"conference", tier:"nurture", founded:"1952", subs:8500, notes:"Legacy provider modernizing. Slow, steady growth.", gvi:0.38, oms:4, ttc:1, wsi:5, dtp:7, sqds:3, decisionMonth:"2027-12", services:["BEAD Compliance","Seasonal Overflow"] },
+  { id:14, name:"Sho-Me Technologies", state:"MO", award:29800000, locs:2800, tech:"Fiber", ceo:"Charlie Kempf", contact:"verified", tier:"nurture", founded:"1951", subs:6000, notes:"Missouri cooperative. Community-rooted operations.", gvi:0.47, oms:3, ttc:1, wsi:6, dtp:8, sqds:2, decisionMonth:"2027-09", services:["Tier 1 Support","BEAD Compliance","Training"] },
+  { id:15, name:"LigTel Communications", state:"IN", award:4800000, locs:600, tech:"Fiber", ceo:"Joe Zarr", contact:"known", tier:"strategic", founded:"1906", subs:4000, notes:"FORMER ISPN PARTNER. Terminated while receiving BEAD funding.", gvi:0.15, oms:3, ttc:1, wsi:3, dtp:6, sqds:7, decisionMonth:"N/A", services:["Re-engagement Opportunity","BEAD Compliance","Growth Support"] },
+];
+
+const INTEL_FEED = [
+  { time:"4m", type:"alert", agent:"Scout", text:"Maverix Broadband posts VP of Operations role on LinkedIn — structural gap confirmed", prospect:"Maverix Broadband", impact:"+8 WSI" },
+  { time:"18m", type:"signal", agent:"Scout", text:"Wisper ISP lists 12 NOC technician openings in Springfield, MO", prospect:"Wisper ISP", impact:"+4 WSI" },
+  { time:"42m", type:"score", agent:"Analyst", text:"White Cloud Communications crosses HOT threshold — score now 82", prospect:"White Cloud Comm", impact:"Tier ↑" },
+  { time:"1.2h", type:"brief", agent:"Strategist", text:"Executive outreach brief generated for Stimulus Technologies — Decision Month approaching", prospect:"Stimulus Technologies", impact:"Brief ready" },
+  { time:"2.5h", type:"capacity", agent:"Planner", text:"Pipeline projects +35 FTE need over next 18 months — training lead time required", prospect:"Portfolio", impact:"Hiring signal" },
+  { time:"3.1h", type:"compete", agent:"Scout", text:"Competitor 'NorthStar BPO' announces partnership with Kansas ISP — IdeaTek white space narrows", prospect:"IdeaTek Telcom", impact:"Competitive" },
+  { time:"5h", type:"signal", agent:"Scout", text:"SkyFiber CEO Mark Feest confirmed speaker at Fiber Connect 2026", prospect:"SkyFiber Inc", impact:"Warm path" },
+  { time:"6.4h", type:"health", agent:"Monitor", text:"Pine Telephone engagement metrics declining 12% QoQ — proactive review recommended", prospect:"Pine Telephone Co", impact:"Retention" },
+  { time:"8h", type:"award", agent:"Scout", text:"Arkansas announces BEAD subgrantee list — 14 new ISPs identified for scoring", prospect:"New Pipeline", impact:"+14 prospects" },
+  { time:"12h", type:"compliance", agent:"Scout", text:"NTIA issues updated BEAD reporting requirements — compliance module updated", prospect:"All Prospects", impact:"Policy change" },
+];
+
+const COMPETITORS = [
+  { name:"NorthStar BPO", partners:8, states:"KS,MO,NE,OK", strength:"Price", weakness:"Quality metrics", threat:"Medium" },
+  { name:"TeleCom Ops Inc", partners:12, states:"CO,UT,WY,MT", strength:"Western US coverage", weakness:"Scale limitations", threat:"High" },
+  { name:"ConnectCare Services", partners:5, states:"VA,WV,NC,TN", strength:"Legacy telco expertise", weakness:"No fiber experience", threat:"Low" },
+  { name:"Rural Support Group", partners:3, states:"MN,WI,ND", strength:"Co-op relationships", weakness:"Startup, thin bench", threat:"Medium" },
+];
+
+function calcScore(p) {
+  const gviScore = Math.min(20, p.gvi >= 3 ? 20 : p.gvi >= 1.5 ? 16 : p.gvi >= 0.5 ? 10 : 5);
+  const omsScore = Math.min(20, (5 - p.oms) * 5);
+  const ttcScore = Math.min(15, p.ttc >= 2.5 ? 15 : p.ttc >= 2 ? 12 : p.ttc >= 1.5 ? 8 : 4);
+  return gviScore + omsScore + ttcScore + p.wsi + p.dtp + p.sqds;
+}
+
+const fmt = (n) => n >= 1e9 ? `$${(n/1e9).toFixed(1)}B` : n >= 1e6 ? `$${(n/1e6).toFixed(1)}M` : n >= 1e3 ? `$${(n/1e3).toFixed(0)}K` : `$${n}`;
+const fmtN = (n) => n >= 1e6 ? `${(n/1e6).toFixed(1)}M` : n >= 1e3 ? `${(n/1e3).toFixed(1)}K` : `${n}`;
+
+const tierColor = (t) => ({ hot: c.hot, warm: c.warm, nurture: c.nurture, strategic: c.strategic }[t] || c.textMuted);
+const tierBg = (t) => ({ hot: c.hotDim, warm: c.warmDim, nurture: c.nurtureDim, strategic: c.strategicDim }[t] || c.surface);
+const agentColor = (a) => ({ Scout:c.scout, Analyst:c.analyst, Strategist:c.strategist, Planner:c.planner, Monitor:c.monitor }[a] || c.accent);
+
+// ═══ MAIN COMPONENT ═══
+export default function BEADPlatform() {
+  const [view, setView] = useState('command');
+  const [selectedId, setSelectedId] = useState(null);
+  const [tierFilter, setTierFilter] = useState('all');
+  const [sortBy, setSortBy] = useState('score');
+  const [simFactors, setSimFactors] = useState({ gvi:2.0, oms:2, ttc:2, wsi:14, dtp:12, sqds:4 });
+  const [finSliders, setFinSliders] = useState({ partners:10, avgSubs:12000, pspm:3.0, retention:2 });
+  const [agentSim, setAgentSim] = useState({ running:false, step:0, log:[] });
+  const [roadmapPhase, setRoadmapPhase] = useState(1);
+  const [feedIdx, setFeedIdx] = useState(5);
+  const [tick, setTick] = useState(0);
+
+  // Pulse animation
+  useEffect(() => { const t = setInterval(() => setTick(k => k+1), 3000); return () => clearInterval(t); }, []);
+
+  const selected = PROSPECTS.find(p => p.id === selectedId);
+
+  const filtered = useMemo(() => {
+    let list = tierFilter === 'all' ? [...PROSPECTS] : PROSPECTS.filter(p => p.tier === tierFilter);
+    list.sort((a,b) => sortBy === 'score' ? calcScore(b) - calcScore(a) : sortBy === 'award' ? b.award - a.award : a.name.localeCompare(b.name));
+    return list;
+  }, [tierFilter, sortBy]);
+
+  const totalMarket = PROSPECTS.reduce((s,p) => s+p.award, 0);
+  const hotCount = PROSPECTS.filter(p => p.tier==='hot').length;
+  const warmCount = PROSPECTS.filter(p => p.tier==='warm').length;
+
+  // Agent simulation
+  const runAgentSim = useCallback(() => {
+    setAgentSim({ running:true, step:0, log:[] });
+    const steps = [
+      { agent:"Scout", action:"Signal detected: Maverix Broadband posts VP Operations on LinkedIn", delay:800 },
+      { agent:"Scout", action:"Extracting structured signal → type: workforce_strain, confidence: 0.94", delay:1200 },
+      { agent:"Analyst", action:"Receiving signal from Scout. Recalculating Operational Strain Score...", delay:1000 },
+      { agent:"Analyst", action:"WSI factor +8 points. New composite: 92 (was 84). Tier threshold crossed → CRITICAL", delay:1400 },
+      { agent:"Strategist", action:"Tier change trigger fired. Generating executive outreach brief...", delay:1000 },
+      { agent:"Strategist", action:"Brief complete: References $103M BEAD award, VP gap, Decision Month Jun 2026", delay:1800 },
+      { agent:"Planner", action:"Pipeline demand updated: +10,232 projected subscribers in capacity model", delay:1200 },
+      { agent:"Planner", action:"Hiring alert: +4 FTE needed by Q3 2026 for fiber Tier 1 support skills", delay:1000 },
+      { agent:"Monitor", action:"Logging event chain. Updating model performance metrics.", delay:800 },
+      { agent:"Monitor", action:"WSI factor accuracy: 87% correlation with conversion at 90-day lag", delay:1200 },
+    ];
+    steps.forEach((s, i) => {
+      setTimeout(() => {
+        setAgentSim(prev => ({
+          ...prev, step: i+1,
+          log: [...prev.log, { ...s, ts: new Date().toLocaleTimeString() }]
+        }));
+        if (i === steps.length - 1) setTimeout(() => setAgentSim(prev => ({...prev, running:false})), 1500);
+      }, steps.slice(0, i+1).reduce((sum, x) => sum + x.delay, 0));
+    });
+  }, []);
+
+  // ─── Styles ───
+  const Label = ({children, style}) => (
+    <div style={{ fontSize:'9px', fontWeight:500, letterSpacing:'0.1em', textTransform:'uppercase', color:c.textMuted, ...style }}>{children}</div>
+  );
+  const Metric = ({value, unit, accent:acc, size=28}) => (
+    <span>
+      <span style={{ fontFamily:mono, fontSize:size, fontWeight:600, letterSpacing:'-0.02em', color:acc||c.text }}>{value}</span>
+      {unit && <span style={{ fontSize:11, color:c.textMuted, marginLeft:4 }}>{unit}</span>}
+    </span>
+  );
+  const Badge = ({tier}) => (
+    <span style={{ padding:'3px 8px', borderRadius:4, fontSize:10, fontWeight:600, letterSpacing:'0.05em', textTransform:'uppercase', color:tierColor(tier), background:tierBg(tier), border:`1px solid ${tierColor(tier)}22` }}>{tier}</span>
+  );
+  const Card = ({children, style, onClick, hover}) => (
+    <div onClick={onClick} style={{ background:c.surface, border:`1px solid ${c.border}`, borderRadius:8, padding:20, cursor:onClick?'pointer':'default', transition:'border-color 0.2s', ...style }}>{children}</div>
+  );
+
+  // ─── Navigation ───
+  const NAV = [
+    { id:'command', label:'Command Center', icon:'◉' },
+    { id:'pipeline', label:'Pipeline Intelligence', icon:'▤' },
+    { id:'strain', label:'Strain Simulator', icon:'◈' },
+    { id:'financial', label:'Financial Model', icon:'$' },
+    { id:'agents', label:'Agent Architecture', icon:'⬡' },
+    { id:'compete', label:'Competitive Map', icon:'◇' },
+    { id:'roadmap', label:'Deployment Roadmap', icon:'▸' },
+  ];
+
+  // ═══ RADAR CHART (SVG) ═══
+  const RadarChart = ({ factors, size=220 }) => {
+    const labels = ['GVI','OMS','TTC','WSI','DTP','SQDS'];
+    const maxes = [20,20,15,20,15,10];
+    const cx = size/2, cy = size/2, r = size/2 - 30;
+    const pts = factors.map((v, i) => {
+      const angle = (Math.PI * 2 * i / 6) - Math.PI/2;
+      const pct = v / maxes[i];
+      return { x: cx + r * pct * Math.cos(angle), y: cy + r * pct * Math.sin(angle), lx: cx + (r+18) * Math.cos(angle), ly: cy + (r+18) * Math.sin(angle), label: labels[i], val: v, max: maxes[i] };
+    });
+    return (
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+        {[0.25,0.5,0.75,1].map(s => (
+          <polygon key={s} points={Array.from({length:6}, (_,i) => {
+            const a = (Math.PI*2*i/6)-Math.PI/2;
+            return `${cx+r*s*Math.cos(a)},${cy+r*s*Math.sin(a)}`;
+          }).join(' ')} fill="none" stroke={c.border} strokeWidth={1} opacity={s===1?0.5:0.3} />
+        ))}
+        {Array.from({length:6}, (_,i) => {
+          const a = (Math.PI*2*i/6)-Math.PI/2;
+          return <line key={i} x1={cx} y1={cy} x2={cx+r*Math.cos(a)} y2={cy+r*Math.sin(a)} stroke={c.border} strokeWidth={1} opacity={0.3} />;
+        })}
+        <polygon points={pts.map(p => `${p.x},${p.y}`).join(' ')} fill={c.accentDim} stroke={c.accent} strokeWidth={2} />
+        {pts.map((p,i) => (
+          <g key={i}>
+            <circle cx={p.x} cy={p.y} r={4} fill={c.accent} />
+            <text x={p.lx} y={p.ly} textAnchor="middle" dominantBaseline="middle" fill={c.textMuted} fontSize={9} fontFamily={mono} fontWeight={500}>{p.label}</text>
+          </g>
+        ))}
+      </svg>
+    );
+  };
+
+  // ═══ MINI BAR ═══
+  const MiniBar = ({val, max, color=c.accent}) => (
+    <div style={{ width:'100%', height:4, background:c.border, borderRadius:2, overflow:'hidden' }}>
+      <div style={{ width:`${Math.min(100,(val/max)*100)}%`, height:'100%', background:color, borderRadius:2, transition:'width 0.5s ease' }} />
+    </div>
+  );
+
+  // ═══════ VIEWS ═══════
+
+  // ─── COMMAND CENTER ───
+  const CommandCenter = () => (
+    <div style={{ display:'grid', gridTemplateColumns:'1fr 340px', gap:20, padding:24 }}>
+      <div>
+        {/* Hero Metrics Row */}
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:12, marginBottom:20 }}>
+          {[
+            { label:'TOTAL ADDRESSABLE MARKET', value:fmt(totalMarket), accent:true },
+            { label:'HOT PROSPECTS', value:hotCount, sub:`${warmCount} warm` },
+            { label:'DECISION MONTHS Q2-Q3 2026', value:'6', sub:'outreach window open' },
+            { label:'PROJECTED YEAR 1 REVENUE', value:'$2.5M–$5M', accent:true, small:true },
+          ].map((m,i) => (
+            <Card key={i} style={{ padding:16 }}>
+              <Label>{m.label}</Label>
+              <div style={{ marginTop:8 }}>
+                <span style={{ fontFamily:mono, fontSize:m.small?20:28, fontWeight:600, letterSpacing:'-0.02em', color:m.accent?c.accent:c.text }}>{m.value}</span>
+                {m.sub && <div style={{ fontSize:11, color:c.textMuted, marginTop:2 }}>{m.sub}</div>}
+              </div>
+            </Card>
+          ))}
+        </div>
+
+        {/* Prospect Table */}
+        <Card style={{ padding:0, overflow:'hidden' }}>
+          <div style={{ padding:'14px 16px', borderBottom:`1px solid ${c.border}`, display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+            <Label style={{ color:c.accent }}>PROSPECT PIPELINE — TOP SCORED</Label>
+            <div style={{ display:'flex', gap:6 }}>
+              {['all','hot','warm','nurture','strategic'].map(t => (
+                <button key={t} onClick={() => setTierFilter(t)} style={{
+                  padding:'3px 10px', borderRadius:4, border:`1px solid ${tierFilter===t ? (t==='all'?c.accent:tierColor(t)) : c.border}`,
+                  background:tierFilter===t ? (t==='all'?c.accentDim:tierBg(t)) : 'transparent',
+                  color:tierFilter===t ? (t==='all'?c.accent:tierColor(t)) : c.textMuted,
+                  fontSize:10, fontWeight:500, cursor:'pointer', textTransform:'uppercase', letterSpacing:'0.05em',
+                }}>{t}</button>
+              ))}
+            </div>
+          </div>
+          <div style={{ overflowX:'auto' }}>
+            <table style={{ width:'100%', borderCollapse:'collapse' }}>
+              <thead>
+                <tr style={{ borderBottom:`1px solid ${c.border}` }}>
+                  {['Score','Company','State','Award','Locations','Tech','Decision Mo','Tier'].map((h,i) => (
+                    <th key={i} style={{ padding:'10px 12px', fontSize:9, fontWeight:500, letterSpacing:'0.1em', textTransform:'uppercase', color:c.textMuted, textAlign:i<1?'center':'left', cursor:['Score','Company','Award'].includes(h)?'pointer':'default', whiteSpace:'nowrap' }}
+                      onClick={() => h==='Score'?setSortBy('score'):h==='Company'?setSortBy('name'):h==='Award'?setSortBy('award'):null}>
+                      {h}{sortBy===(h==='Score'?'score':h==='Company'?'name':h==='Award'?'award':'') ? ' ↓' : ''}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.slice(0,12).map((p,idx) => {
+                  const score = calcScore(p);
+                  return (
+                    <tr key={p.id} onClick={() => { setSelectedId(p.id); setView('pipeline'); }}
+                      style={{ borderBottom:`1px solid ${c.borderLight}`, cursor:'pointer', transition:'background 0.15s', background: selectedId===p.id ? c.accentDim : 'transparent' }}
+                      onMouseEnter={e => e.currentTarget.style.background = c.surfaceAlt}
+                      onMouseLeave={e => e.currentTarget.style.background = selectedId===p.id ? c.accentDim : 'transparent'}>
+                      <td style={{ padding:'10px 12px', textAlign:'center' }}>
+                        <span style={{ fontFamily:mono, fontSize:14, fontWeight:600, color: score>=80?c.hot:score>=60?c.warm:score>=40?c.nurture:c.textMuted }}>{score}</span>
+                      </td>
+                      <td style={{ padding:'10px 12px' }}>
+                        <span style={{ fontSize:13, fontWeight:500, color:c.text }}>{p.name}</span>
+                        {p.name==='LigTel Communications' && <span style={{ marginLeft:6, fontSize:9, padding:'2px 6px', borderRadius:3, background:'rgba(167,139,250,0.15)', color:c.strategic, fontWeight:600 }}>EX-PARTNER</span>}
+                      </td>
+                      <td style={{ padding:'10px 12px', fontFamily:mono, fontSize:12, color:c.textSecondary }}>{p.state}</td>
+                      <td style={{ padding:'10px 12px', fontFamily:mono, fontSize:12, color:c.accent }}>{fmt(p.award)}</td>
+                      <td style={{ padding:'10px 12px', fontFamily:mono, fontSize:12, color:c.textSecondary }}>{fmtN(p.locs)}</td>
+                      <td style={{ padding:'10px 12px', fontSize:11, color:c.textSecondary }}>{p.tech}</td>
+                      <td style={{ padding:'10px 12px', fontFamily:mono, fontSize:12, color:p.decisionMonth==='N/A'?c.textMuted:c.warning }}>{p.decisionMonth}</td>
+                      <td style={{ padding:'10px 12px' }}><Badge tier={p.tier} /></td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </Card>
+      </div>
+
+      {/* Right: Intelligence Feed */}
+      <div>
+        <Card style={{ padding:0, overflow:'hidden' }}>
+          <div style={{ padding:'14px 16px', borderBottom:`1px solid ${c.border}`, display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+            <Label style={{ color:c.accent }}>INTELLIGENCE FEED</Label>
+            <div style={{ display:'flex', alignItems:'center', gap:6 }}>
+              <span style={{ width:6, height:6, borderRadius:'50%', background:c.success, animation:'pulse 1.5s infinite' }} />
+              <span style={{ fontSize:10, color:c.success, fontWeight:500 }}>LIVE</span>
+            </div>
+          </div>
+          <div style={{ maxHeight:560, overflowY:'auto' }}>
+            {INTEL_FEED.slice(0, feedIdx).map((item, i) => (
+              <div key={i} style={{ padding:'12px 16px', borderBottom:`1px solid ${c.borderLight}`, transition:'background 0.15s' }}
+                onMouseEnter={e => e.currentTarget.style.background=c.surfaceAlt}
+                onMouseLeave={e => e.currentTarget.style.background='transparent'}>
+                <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:4 }}>
+                  <div style={{ display:'flex', alignItems:'center', gap:6 }}>
+                    <span style={{ fontSize:9, fontWeight:600, color:agentColor(item.agent), padding:'2px 6px', borderRadius:3, background:`${agentColor(item.agent)}15`, letterSpacing:'0.05em' }}>{item.agent.toUpperCase()}</span>
+                    <span style={{ fontFamily:mono, fontSize:10, color:c.textMuted }}>{item.time}</span>
+                  </div>
+                  <span style={{ fontSize:10, fontFamily:mono, color:c.accent, fontWeight:500 }}>{item.impact}</span>
+                </div>
+                <div style={{ fontSize:12, color:c.textSecondary, lineHeight:1.4 }}>{item.text}</div>
+              </div>
+            ))}
+          </div>
+          {feedIdx < INTEL_FEED.length && (
+            <div style={{ padding:12, textAlign:'center', borderTop:`1px solid ${c.border}` }}>
+              <button onClick={() => setFeedIdx(f => Math.min(f+3, INTEL_FEED.length))} style={{ background:'transparent', border:`1px solid ${c.border}`, color:c.accent, padding:'6px 16px', borderRadius:4, cursor:'pointer', fontSize:11, fontWeight:500 }}>Load More Signals</button>
+            </div>
+          )}
+        </Card>
+
+        {/* Market Context */}
+        <Card style={{ marginTop:12, padding:16 }}>
+          <Label style={{ marginBottom:10 }}>BEAD PROGRAM STATUS</Label>
+          {[
+            { label:'States Approved', value:'50/56', pct:89 },
+            { label:'Construction Active', value:'12 states', pct:21 },
+            { label:'Funds Disbursing', value:'3 states', pct:5 },
+          ].map((s,i) => (
+            <div key={i} style={{ marginBottom:10 }}>
+              <div style={{ display:'flex', justifyContent:'space-between', marginBottom:3 }}>
+                <span style={{ fontSize:11, color:c.textSecondary }}>{s.label}</span>
+                <span style={{ fontFamily:mono, fontSize:11, color:c.accent, fontWeight:500 }}>{s.value}</span>
+              </div>
+              <MiniBar val={s.pct} max={100} />
+            </div>
+          ))}
+        </Card>
+
+        <Card style={{ marginTop:12, padding:16 }}>
+          <Label style={{ marginBottom:10 }}>TECHNOLOGY MIX IN PIPELINE</Label>
+          {[
+            { label:'Fiber', pct:63, color:c.accent },
+            { label:'Fiber/FWA Transition', pct:18, color:c.warm },
+            { label:'FWA → Fiber', pct:12, color:c.nurture },
+            { label:'Multi-Technology', pct:7, color:c.strategic },
+          ].map((t,i) => (
+            <div key={i} style={{ marginBottom:8 }}>
+              <div style={{ display:'flex', justifyContent:'space-between', marginBottom:3 }}>
+                <span style={{ fontSize:11, color:c.textSecondary }}>{t.label}</span>
+                <span style={{ fontFamily:mono, fontSize:11, color:t.color, fontWeight:500 }}>{t.pct}%</span>
+              </div>
+              <MiniBar val={t.pct} max={100} color={t.color} />
+            </div>
+          ))}
+        </Card>
+      </div>
+    </div>
+  );
+
+  // ─── PIPELINE + DETAIL ───
+  const PipelineView = () => (
+    <div style={{ display:'grid', gridTemplateColumns:selected ? '1fr 380px' : '1fr', gap:0, height:'calc(100vh - 60px)' }}>
+      <div style={{ padding:24, overflowY:'auto' }}>
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:16 }}>
+          <div>
+            <Label style={{ color:c.accent }}>PIPELINE INTELLIGENCE</Label>
+            <div style={{ fontSize:15, color:c.text, marginTop:4 }}>{filtered.length} prospects scored across {new Set(PROSPECTS.map(p=>p.state)).size} states</div>
+          </div>
+          <div style={{ display:'flex', gap:6 }}>
+            {['all','hot','warm','nurture','strategic'].map(t => (
+              <button key={t} onClick={() => setTierFilter(t)} style={{
+                padding:'4px 12px', borderRadius:4, border:`1px solid ${tierFilter===t ? (t==='all'?c.accent:tierColor(t)) : c.border}`,
+                background:tierFilter===t ? (t==='all'?c.accentDim:tierBg(t)) : 'transparent',
+                color:tierFilter===t ? (t==='all'?c.accent:tierColor(t)) : c.textMuted,
+                fontSize:10, fontWeight:500, cursor:'pointer', textTransform:'uppercase',
+              }}>{t}</button>
+            ))}
+          </div>
+        </div>
+        {filtered.map((p) => {
+          const score = calcScore(p);
+          const isSelected = selectedId === p.id;
+          return (
+            <div key={p.id} onClick={() => setSelectedId(p.id)} style={{
+              padding:16, marginBottom:8, borderRadius:8, cursor:'pointer', transition:'all 0.2s',
+              background: isSelected ? c.accentDim : c.surface,
+              border: `1px solid ${isSelected ? c.accentBorder : c.border}`,
+            }}>
+              <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+                <div style={{ display:'flex', alignItems:'center', gap:12 }}>
+                  <div style={{ width:40, height:40, borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center',
+                    background: score>=80?c.hotDim:score>=60?c.warmDim:score>=40?c.nurtureDim:c.surfaceAlt,
+                    border:`2px solid ${score>=80?c.hot:score>=60?c.warm:score>=40?c.nurture:c.border}` }}>
+                    <span style={{ fontFamily:mono, fontSize:13, fontWeight:600, color:score>=80?c.hot:score>=60?c.warm:score>=40?c.nurture:c.textMuted }}>{score}</span>
+                  </div>
+                  <div>
+                    <div style={{ fontSize:14, fontWeight:500, color:c.text }}>{p.name}
+                      {p.name==='LigTel Communications' && <span style={{ marginLeft:8, fontSize:9, padding:'2px 6px', borderRadius:3, background:c.strategicDim, color:c.strategic, fontWeight:600 }}>EX-PARTNER</span>}
+                    </div>
+                    <div style={{ fontSize:11, color:c.textMuted, marginTop:2 }}>{p.state} · {p.tech} · Founded {p.founded}</div>
+                  </div>
+                </div>
+                <div style={{ textAlign:'right' }}>
+                  <div style={{ fontFamily:mono, fontSize:16, fontWeight:600, color:c.accent }}>{fmt(p.award)}</div>
+                  <div style={{ fontSize:10, color:c.textMuted }}>{fmtN(p.locs)} locations</div>
+                </div>
+              </div>
+              <div style={{ marginTop:10, fontSize:12, color:c.textSecondary, lineHeight:1.4 }}>{p.notes}</div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Detail Panel */}
+      {selected && (
+        <div style={{ borderLeft:`1px solid ${c.border}`, background:c.surface, overflowY:'auto', padding:20 }}>
+          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:16 }}>
+            <div>
+              <Label style={{ color:c.accent, marginBottom:4 }}>PROSPECT DETAIL</Label>
+              <div style={{ fontSize:16, fontWeight:500 }}>{selected.name}</div>
+            </div>
+            <button onClick={() => setSelectedId(null)} style={{ background:'transparent', border:`1px solid ${c.border}`, color:c.textMuted, width:28, height:28, borderRadius:4, cursor:'pointer', fontSize:14 }}>×</button>
+          </div>
+
+          {/* Score Card */}
+          <div style={{ background:c.bg, borderRadius:8, padding:16, border:`1px solid ${c.border}`, marginBottom:16, textAlign:'center' }}>
+            <Metric value={calcScore(selected)} size={40} accent={calcScore(selected)>=80?c.hot:calcScore(selected)>=60?c.warm:c.nurture} />
+            <div style={{ fontSize:10, color:c.textMuted, marginTop:4 }}>COMPOSITE STRAIN SCORE</div>
+            <Badge tier={selected.tier} />
+          </div>
+
+          {/* Radar */}
+          <div style={{ display:'flex', justifyContent:'center', marginBottom:12 }}>
+            <RadarChart factors={[
+              Math.min(20, selected.gvi >= 3 ? 20 : selected.gvi >= 1.5 ? 16 : selected.gvi >= 0.5 ? 10 : 5),
+              Math.min(20, (5 - selected.oms) * 5),
+              Math.min(15, selected.ttc >= 2.5 ? 15 : selected.ttc >= 2 ? 12 : selected.ttc >= 1.5 ? 8 : 4),
+              selected.wsi, selected.dtp, selected.sqds
+            ]} size={200} />
+          </div>
+
+          {/* Factor Breakdown */}
+          <Label style={{ marginBottom:8 }}>FACTOR BREAKDOWN</Label>
+          {[
+            { label:'Growth Velocity', val:selected.gvi, display:selected.gvi>=99?'∞':selected.gvi.toFixed(2)+'x', max:20, score: Math.min(20, selected.gvi >= 3 ? 20 : selected.gvi >= 1.5 ? 16 : selected.gvi >= 0.5 ? 10 : 5) },
+            { label:'Org Maturity', val:selected.oms, display:selected.oms+'/5', max:20, score:Math.min(20,(5-selected.oms)*5) },
+            { label:'Tech Complexity', val:selected.ttc, display:selected.ttc+'x', max:15, score:Math.min(15, selected.ttc >= 2.5 ? 15 : selected.ttc >= 2 ? 12 : selected.ttc >= 1.5 ? 8 : 4) },
+            { label:'Workforce Strain', val:selected.wsi, display:selected.wsi+'/20', max:20, score:selected.wsi },
+            { label:'Timeline Pressure', val:selected.dtp, display:selected.dtp+'/15', max:15, score:selected.dtp },
+            { label:'Quality Degradation', val:selected.sqds, display:selected.sqds+'/10', max:10, score:selected.sqds },
+          ].map((f,i) => (
+            <div key={i} style={{ marginBottom:8 }}>
+              <div style={{ display:'flex', justifyContent:'space-between', fontSize:11, marginBottom:3 }}>
+                <span style={{ color:c.textSecondary }}>{f.label}</span>
+                <span style={{ fontFamily:mono, color:c.accent, fontWeight:500 }}>{f.display} → {f.score}pts</span>
+              </div>
+              <MiniBar val={f.score} max={f.max} />
+            </div>
+          ))}
+
+          {/* Services */}
+          <Label style={{ marginTop:16, marginBottom:8 }}>ISPN SERVICE ALIGNMENT</Label>
+          {selected.services.map((s,i) => (
+            <div key={i} style={{ padding:'6px 10px', marginBottom:4, borderRadius:4, background:c.bg, border:`1px solid ${c.border}`, fontSize:11, color:c.textSecondary, display:'flex', alignItems:'center', gap:8 }}>
+              <span style={{ color:c.accent }}>●</span> {s}
+            </div>
+          ))}
+
+          {/* Decision Month */}
+          {selected.decisionMonth !== 'N/A' && (
+            <div style={{ marginTop:16, padding:12, borderRadius:6, background:c.warmDim, border:`1px solid ${c.warm}33` }}>
+              <Label style={{ color:c.warm }}>PREDICTED DECISION MONTH</Label>
+              <div style={{ fontFamily:mono, fontSize:20, fontWeight:600, color:c.warm, marginTop:4 }}>{selected.decisionMonth}</div>
+              <div style={{ fontSize:11, color:c.textMuted, marginTop:2 }}>Begin outreach 90 days prior</div>
+            </div>
+          )}
+
+          {/* Key Intel */}
+          <div style={{ marginTop:16, padding:12, borderRadius:6, borderLeft:`3px solid ${c.accent}`, background:c.bg }}>
+            <Label style={{ color:c.accent, marginBottom:4 }}>KEY INTEL</Label>
+            <div style={{ fontSize:12, color:c.textSecondary, lineHeight:1.5 }}>
+              <div><span style={{ color:c.text, fontWeight:500 }}>Award:</span> {fmt(selected.award)}</div>
+              <div><span style={{ color:c.text, fontWeight:500 }}>Locations:</span> {fmtN(selected.locs)}</div>
+              <div><span style={{ color:c.text, fontWeight:500 }}>Current Subs:</span> {selected.subs === 0 ? 'Greenfield' : fmtN(selected.subs)}</div>
+              <div><span style={{ color:c.text, fontWeight:500 }}>CEO:</span> {selected.ceo}</div>
+              <div><span style={{ color:c.text, fontWeight:500 }}>Contact Path:</span> {selected.contact}</div>
+              <div style={{ marginTop:6, fontStyle:'italic', color:c.textMuted }}>{selected.notes}</div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+
+  // ─── STRAIN SIMULATOR ───
+  const StrainSim = () => {
+    const simGvi = Math.min(20, simFactors.gvi >= 3 ? 20 : simFactors.gvi >= 1.5 ? 16 : simFactors.gvi >= 0.5 ? 10 : 5);
+    const simOms = Math.min(20, (5 - simFactors.oms) * 5);
+    const simTtc = Math.min(15, simFactors.ttc >= 2.5 ? 15 : simFactors.ttc >= 2 ? 12 : simFactors.ttc >= 1.5 ? 8 : 4);
+    const simTotal = simGvi + simOms + simTtc + simFactors.wsi + simFactors.dtp + simFactors.sqds;
+    const simTier = simTotal >= 80 ? 'CRITICAL' : simTotal >= 60 ? 'HIGH' : simTotal >= 40 ? 'MODERATE' : 'LOW';
+    const simColor = simTotal >= 80 ? c.hot : simTotal >= 60 ? c.warm : simTotal >= 40 ? c.nurture : c.textMuted;
+    const monthsToDecision = Math.max(1, Math.round(24 - (simTotal / 100) * 18));
+
+    return (
+      <div style={{ padding:24, maxWidth:1000, margin:'0 auto' }}>
+        <Label style={{ color:c.accent }}>OPERATIONAL STRAIN SIMULATOR</Label>
+        <div style={{ fontSize:15, color:c.text, marginTop:4, marginBottom:24 }}>Adjust factors to model any ISP's operational trajectory and predicted decision timeline</div>
+
+        <div style={{ display:'grid', gridTemplateColumns:'1fr 300px', gap:24 }}>
+          <div>
+            {/* Sliders */}
+            {[
+              { key:'gvi', label:'Growth Velocity Index', sub:'(new locations ÷ current subscribers)', min:0, max:5, step:0.1, val:simFactors.gvi, display:simFactors.gvi.toFixed(1)+'x', score:simGvi, maxScore:20 },
+              { key:'oms', label:'Organizational Maturity', sub:'(1=startup, 5=mature operator)', min:1, max:5, step:1, val:simFactors.oms, display:simFactors.oms+'/5', score:simOms, maxScore:20 },
+              { key:'ttc', label:'Technology Transition Complexity', sub:'(1x=same tech, 3x=greenfield multi)', min:1, max:3, step:0.5, val:simFactors.ttc, display:simFactors.ttc+'x', score:simTtc, maxScore:15 },
+              { key:'wsi', label:'Workforce Strain Index', sub:'(job postings, hiring gaps)', min:0, max:20, step:1, val:simFactors.wsi, display:simFactors.wsi+'/20', score:simFactors.wsi, maxScore:20 },
+              { key:'dtp', label:'Deployment Timeline Pressure', sub:'(construction deadlines, milestones)', min:0, max:15, step:1, val:simFactors.dtp, display:simFactors.dtp+'/15', score:simFactors.dtp, maxScore:15 },
+              { key:'sqds', label:'Service Quality Degradation', sub:'(FCC complaints, reviews, outages)', min:0, max:10, step:1, val:simFactors.sqds, display:simFactors.sqds+'/10', score:simFactors.sqds, maxScore:10 },
+            ].map((s,i) => (
+              <Card key={i} style={{ padding:16, marginBottom:10 }}>
+                <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline', marginBottom:2 }}>
+                  <div>
+                    <span style={{ fontSize:13, fontWeight:500, color:c.text }}>{s.label}</span>
+                    <span style={{ fontSize:10, color:c.textMuted, marginLeft:6 }}>{s.sub}</span>
+                  </div>
+                  <div style={{ display:'flex', alignItems:'baseline', gap:8 }}>
+                    <span style={{ fontFamily:mono, fontSize:16, fontWeight:600, color:c.accent }}>{s.display}</span>
+                    <span style={{ fontFamily:mono, fontSize:12, color:c.textMuted }}>→ {s.score}/{s.maxScore}</span>
+                  </div>
+                </div>
+                <input type="range" min={s.min} max={s.max} step={s.step} value={s.val}
+                  onChange={e => setSimFactors(prev => ({...prev, [s.key]:Number(e.target.value)}))}
+                  style={{ width:'100%', height:4, appearance:'none', background:c.border, borderRadius:2, cursor:'pointer', marginTop:8 }} />
+              </Card>
+            ))}
+
+            {/* Presets */}
+            <div style={{ display:'flex', gap:8, marginTop:8 }}>
+              {[
+                { label:'Greenfield Startup', vals:{ gvi:5, oms:1, ttc:3, wsi:18, dtp:14, sqds:0 } },
+                { label:'Mature Telco', vals:{ gvi:0.4, oms:4, ttc:1, wsi:4, dtp:7, sqds:5 } },
+                { label:'FWA→Fiber Transition', vals:{ gvi:1.8, oms:3, ttc:2.5, wsi:12, dtp:12, sqds:4 } },
+                { label:'Electric Co-op ISP', vals:{ gvi:0.6, oms:2, ttc:2, wsi:10, dtp:10, sqds:1 } },
+              ].map((preset,i) => (
+                <button key={i} onClick={() => setSimFactors(preset.vals)} style={{
+                  flex:1, padding:'8px 6px', borderRadius:6, border:`1px solid ${c.border}`, background:c.surface,
+                  color:c.textSecondary, fontSize:10, fontWeight:500, cursor:'pointer', transition:'all 0.2s',
+                }}>{preset.label}</button>
+              ))}
+            </div>
+          </div>
+
+          {/* Results Panel */}
+          <div>
+            <Card style={{ padding:20, textAlign:'center', marginBottom:12, border:`1px solid ${simColor}33`, background:`${simColor}08` }}>
+              <Label>COMPOSITE STRAIN SCORE</Label>
+              <div style={{ fontFamily:mono, fontSize:56, fontWeight:600, letterSpacing:'-0.03em', color:simColor, lineHeight:1, marginTop:8 }}>{simTotal}</div>
+              <div style={{ fontFamily:mono, fontSize:14, fontWeight:600, color:simColor, marginTop:8, letterSpacing:'0.05em' }}>{simTier}</div>
+              <div style={{ fontSize:11, color:c.textMuted, marginTop:8 }}>of 100 maximum</div>
+            </Card>
+            <Card style={{ padding:20, textAlign:'center', marginBottom:12 }}>
+              <Label>PREDICTED DECISION MONTH</Label>
+              <div style={{ fontFamily:mono, fontSize:32, fontWeight:600, color:c.warning, marginTop:8 }}>{monthsToDecision}</div>
+              <div style={{ fontSize:11, color:c.textMuted }}>months from now</div>
+              <div style={{ fontSize:10, color:c.textMuted, marginTop:4 }}>Begin outreach in {Math.max(1, monthsToDecision-3)} months</div>
+            </Card>
+            <Card style={{ padding:16 }}>
+              <div style={{ display:'flex', justifyContent:'center' }}>
+                <RadarChart factors={[simGvi, simOms, simTtc, simFactors.wsi, simFactors.dtp, simFactors.sqds]} size={200} />
+              </div>
+            </Card>
+            <Card style={{ padding:16, marginTop:12 }}>
+              <Label style={{ marginBottom:8 }}>RECOMMENDED ACTION</Label>
+              <div style={{ fontSize:12, color:c.textSecondary, lineHeight:1.5 }}>
+                {simTotal >= 80 ? 'Immediate executive engagement. This ISP is within 90 days of needing managed services. Prepare contextual outreach brief referencing specific operational signals.' :
+                 simTotal >= 60 ? 'Schedule outreach within 30 days. Lead with capability presentation aligned to highest-scoring strain factors. Target conference encounters if available.' :
+                 simTotal >= 40 ? 'Place in nurture sequence. Quarterly touchpoints with relevant thought leadership content. Monitor for signal changes that could accelerate timeline.' :
+                 'Early stage — monitor for changes. Add to annual review cycle. Watch for funding milestones that trigger re-assessment.'}
+              </div>
+            </Card>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // ─── FINANCIAL MODEL ───
+  const FinancialModel = () => {
+    const annualRev = finSliders.partners * finSliders.avgSubs * finSliders.pspm * 12;
+    const retainedRev = finSliders.retention * 450000;
+    const totalRev = annualRev + retainedRev;
+    const devCost = 45000;
+    const opsCost = 2400;
+    const totalCost = devCost + opsCost;
+    const roi = ((totalRev - totalCost) / totalCost * 100).toFixed(0);
+    const costPerSub = finSliders.avgSubs > 0 ? (totalCost / (finSliders.partners * finSliders.avgSubs)).toFixed(4) : 0;
+
+    return (
+      <div style={{ padding:24, maxWidth:1000, margin:'0 auto' }}>
+        <Label style={{ color:c.accent }}>FINANCIAL INTELLIGENCE MODEL</Label>
+        <div style={{ fontSize:15, color:c.text, marginTop:4, marginBottom:24 }}>Model revenue impact, ROI, and cost economics of the Partner Intelligence Platform</div>
+
+        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:20 }}>
+          {/* Input Sliders */}
+          <div>
+            <Card style={{ padding:20, marginBottom:12 }}>
+              <Label style={{ marginBottom:16 }}>SCENARIO PARAMETERS</Label>
+              {[
+                { key:'partners', label:'New Partnerships (Year 1)', min:1, max:25, step:1, val:finSliders.partners, display:finSliders.partners },
+                { key:'avgSubs', label:'Avg Subscribers per Partner', min:2000, max:30000, step:1000, val:finSliders.avgSubs, display:fmtN(finSliders.avgSubs) },
+                { key:'pspm', label:'Per-Subscriber-Per-Month Rate', min:1.5, max:5.0, step:0.25, val:finSliders.pspm, display:`$${finSliders.pspm.toFixed(2)}` },
+                { key:'retention', label:'Terminations Prevented', min:0, max:5, step:1, val:finSliders.retention, display:finSliders.retention },
+              ].map((s,i) => (
+                <div key={i} style={{ marginBottom:20 }}>
+                  <div style={{ display:'flex', justifyContent:'space-between', marginBottom:6 }}>
+                    <span style={{ fontSize:12, color:c.textSecondary }}>{s.label}</span>
+                    <span style={{ fontFamily:mono, fontSize:14, fontWeight:600, color:c.accent }}>{s.display}</span>
+                  </div>
+                  <input type="range" min={s.min} max={s.max} step={s.step} value={s.val}
+                    onChange={e => setFinSliders(prev => ({...prev, [s.key]:Number(e.target.value)}))}
+                    style={{ width:'100%', height:4, appearance:'none', background:c.border, borderRadius:2, cursor:'pointer' }} />
+                </div>
+              ))}
+            </Card>
+            <Card style={{ padding:20 }}>
+              <Label style={{ marginBottom:12 }}>PLATFORM INVESTMENT</Label>
+              {[
+                { label:'Development (one-time)', value:`$${(devCost/1000).toFixed(0)}K` },
+                { label:'Annual Operations (APIs, tools)', value:`$${(opsCost/1000).toFixed(1)}K` },
+                { label:'Total Year 1 Investment', value:`$${(totalCost/1000).toFixed(0)}K`, accent:true },
+              ].map((r,i) => (
+                <div key={i} style={{ display:'flex', justifyContent:'space-between', padding:'8px 0', borderBottom:i<2?`1px solid ${c.border}`:'none' }}>
+                  <span style={{ fontSize:12, color:c.textSecondary }}>{r.label}</span>
+                  <span style={{ fontFamily:mono, fontSize:13, fontWeight:r.accent?600:400, color:r.accent?c.accent:c.text }}>{r.value}</span>
+                </div>
+              ))}
+            </Card>
+          </div>
+
+          {/* Results */}
+          <div>
+            <Card style={{ padding:24, textAlign:'center', marginBottom:12, border:`1px solid ${c.accentBorder}`, background:c.accentDim }}>
+              <Label>RETURN ON INVESTMENT</Label>
+              <div style={{ fontFamily:mono, fontSize:56, fontWeight:600, letterSpacing:'-0.03em', color:c.accent, lineHeight:1, marginTop:8 }}>{roi > 9999 ? '∞' : roi}:1</div>
+              <div style={{ fontSize:11, color:c.textMuted, marginTop:8 }}>Platform pays for itself with a fraction of the first deal</div>
+            </Card>
+
+            <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12, marginBottom:12 }}>
+              <Card style={{ padding:16, textAlign:'center' }}>
+                <Label>NEW ANNUAL REVENUE</Label>
+                <div style={{ fontFamily:mono, fontSize:24, fontWeight:600, color:c.accent, marginTop:8 }}>{fmt(annualRev)}</div>
+                <div style={{ fontSize:10, color:c.textMuted, marginTop:2 }}>{finSliders.partners} partners × {fmtN(finSliders.avgSubs)} subs</div>
+              </Card>
+              <Card style={{ padding:16, textAlign:'center' }}>
+                <Label>RETAINED REVENUE</Label>
+                <div style={{ fontFamily:mono, fontSize:24, fontWeight:600, color:c.warning, marginTop:8 }}>{fmt(retainedRev)}</div>
+                <div style={{ fontSize:10, color:c.textMuted, marginTop:2 }}>{finSliders.retention} terminations prevented</div>
+              </Card>
+            </div>
+
+            <Card style={{ padding:16, textAlign:'center', marginBottom:12 }}>
+              <Label>TOTAL REVENUE IMPACT</Label>
+              <div style={{ fontFamily:mono, fontSize:36, fontWeight:600, color:c.text, marginTop:8 }}>{fmt(totalRev)}</div>
+              <div style={{ fontSize:11, color:c.textMuted, marginTop:4 }}>new revenue + retained revenue annually</div>
+            </Card>
+
+            <Card style={{ padding:16 }}>
+              <Label style={{ marginBottom:10 }}>REVENUE COMPOSITION</Label>
+              <div style={{ height:20, borderRadius:4, overflow:'hidden', display:'flex', marginBottom:10 }}>
+                <div style={{ width:`${totalRev>0?(annualRev/totalRev*100):0}%`, background:c.accent, transition:'width 0.5s' }} />
+                <div style={{ width:`${totalRev>0?(retainedRev/totalRev*100):0}%`, background:c.warning, transition:'width 0.5s' }} />
+              </div>
+              <div style={{ display:'flex', justifyContent:'space-between', fontSize:10, color:c.textMuted }}>
+                <span><span style={{ color:c.accent }}>●</span> New partnerships ({totalRev>0?Math.round(annualRev/totalRev*100):0}%)</span>
+                <span><span style={{ color:c.warning }}>●</span> Retention impact ({totalRev>0?Math.round(retainedRev/totalRev*100):0}%)</span>
+              </div>
+            </Card>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // ─── AGENT ARCHITECTURE ───
+  const AgentView = () => {
+    const agents = [
+      { name:'SCOUT', sub:'The Eyes', color:c.scout, desc:'Monitors 50+ data sources continuously. Detects signals from press releases, job postings, FCC complaints, conference calendars, and regulatory filings. Average latency: 2–6 hours.', triggers:'RSS feeds, web scrapes, API monitors', outputs:'Tagged signal events → Analyst' },
+      { name:'ANALYST', sub:'The Brain', color:c.analyst, desc:'Transforms raw signals into scored intelligence. Recalculates Operational Strain Scores, identifies tier threshold crossings, and maintains rolling Decision Month estimates.', triggers:'Signal events from Scout', outputs:'Scored profiles, tier alerts → Strategist' },
+      { name:'STRATEGIST', sub:'The Voice', color:c.strategist, desc:'Generates contextual executive outreach briefs using Claude API. Recommends channel, timing, and message angle for each prospect based on their specific situation.', triggers:'Tier changes, Decision Month approaching', outputs:'Outreach briefs → Sales team' },
+      { name:'PLANNER', sub:'The Operator', color:c.planner, desc:'Translates pipeline into operational readiness. Calculates required agent headcount by skill type, identifies training gaps, and feeds the WCS forecasting model.', triggers:'Pipeline demand changes', outputs:'Capacity alerts → Tech Center' },
+      { name:'MONITOR', sub:'The Memory', color:c.monitor, desc:'Closes the feedback loop. Ingests outreach outcomes, correlates with scoring factors, and generates quarterly model performance reports.', triggers:'Sales outcome data', outputs:'Weight adjustments → All agents' },
+    ];
+
+    return (
+      <div style={{ padding:24 }}>
+        <Label style={{ color:c.accent }}>AGENTIC AI ARCHITECTURE</Label>
+        <div style={{ fontSize:15, color:c.text, marginTop:4, marginBottom:24 }}>Five autonomous agents coordinated by n8n orchestration layer</div>
+
+        <div style={{ display:'grid', gridTemplateColumns:'1fr 400px', gap:20 }}>
+          <div>
+            {/* Agent Cards */}
+            {agents.map((a,i) => (
+              <Card key={i} style={{ padding:0, marginBottom:10, overflow:'hidden', borderLeft:`3px solid ${a.color}` }}>
+                <div style={{ padding:'14px 16px' }}>
+                  <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:8 }}>
+                    <span style={{ fontFamily:mono, fontSize:13, fontWeight:600, color:a.color, letterSpacing:'0.05em' }}>{a.name}</span>
+                    <span style={{ fontSize:11, color:c.textMuted, fontStyle:'italic' }}>— {a.sub}</span>
+                    {agentSim.running && agentSim.log.some(l => l.agent === a.name.charAt(0) + a.name.slice(1).toLowerCase()) && (
+                      <span style={{ display:'flex', alignItems:'center', gap:4 }}>
+                        <span style={{ width:6, height:6, borderRadius:'50%', background:a.color, animation:'pulse 1s infinite' }} />
+                        <span style={{ fontSize:9, color:a.color, fontWeight:500 }}>ACTIVE</span>
+                      </span>
+                    )}
+                  </div>
+                  <div style={{ fontSize:12, color:c.textSecondary, lineHeight:1.5, marginBottom:10 }}>{a.desc}</div>
+                  <div style={{ display:'flex', gap:16, fontSize:10 }}>
+                    <div><span style={{ color:c.textMuted }}>Triggers: </span><span style={{ color:c.textSecondary }}>{a.triggers}</span></div>
+                  </div>
+                  <div style={{ fontSize:10, marginTop:4 }}><span style={{ color:c.textMuted }}>Outputs: </span><span style={{ color:a.color, fontWeight:500 }}>{a.outputs}</span></div>
+                </div>
+              </Card>
+            ))}
+
+            <button onClick={runAgentSim} disabled={agentSim.running} style={{
+              width:'100%', padding:'14px', borderRadius:8, border:`1px solid ${agentSim.running?c.border:c.accent}`,
+              background:agentSim.running?c.surface:c.accentDim, color:agentSim.running?c.textMuted:c.accent,
+              fontFamily:mono, fontSize:13, fontWeight:600, cursor:agentSim.running?'default':'pointer', marginTop:8,
+              letterSpacing:'0.05em', transition:'all 0.3s',
+            }}>{agentSim.running ? '⟳ SIMULATION RUNNING...' : '▶ RUN AGENT CHAIN SIMULATION'}</button>
+          </div>
+
+          {/* Simulation Log */}
+          <div>
+            <Card style={{ padding:0, overflow:'hidden', position:'sticky', top:24 }}>
+              <div style={{ padding:'14px 16px', borderBottom:`1px solid ${c.border}`, display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+                <Label style={{ color:c.accent }}>SIMULATION LOG</Label>
+                {agentSim.running && <span style={{ display:'flex', alignItems:'center', gap:4 }}><span style={{ width:6, height:6, borderRadius:'50%', background:c.error, animation:'pulse 0.8s infinite' }} /><span style={{ fontSize:10, color:c.error, fontWeight:500 }}>PROCESSING</span></span>}
+              </div>
+              <div style={{ maxHeight:500, overflowY:'auto' }}>
+                {agentSim.log.length === 0 ? (
+                  <div style={{ padding:40, textAlign:'center', color:c.textMuted, fontSize:12 }}>Press "Run Simulation" to see the agent chain process a real signal</div>
+                ) : agentSim.log.map((entry, i) => (
+                  <div key={i} style={{ padding:'10px 16px', borderBottom:`1px solid ${c.borderLight}`, animation:'fadeIn 0.3s ease' }}>
+                    <div style={{ display:'flex', alignItems:'center', gap:6, marginBottom:3 }}>
+                      <span style={{ fontSize:9, fontWeight:600, color:agentColor(entry.agent.charAt(0).toUpperCase()+entry.agent.slice(1)), padding:'2px 6px', borderRadius:3, background:`${agentColor(entry.agent.charAt(0).toUpperCase()+entry.agent.slice(1))}15`, letterSpacing:'0.05em' }}>{entry.agent.toUpperCase()}</span>
+                      <span style={{ fontFamily:mono, fontSize:9, color:c.textMuted }}>{entry.ts}</span>
+                    </div>
+                    <div style={{ fontSize:11, color:c.textSecondary, lineHeight:1.4 }}>{entry.action}</div>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // ─── COMPETITIVE MAP ───
+  const CompetitiveMap = () => {
+    const whiteSpace = PROSPECTS.filter(p => !['strategic'].includes(p.tier));
+    const stateCount = {};
+    PROSPECTS.forEach(p => { (p.state === 'Multi' ? ['MO','KS','NE'] : [p.state]).forEach(s => { stateCount[s] = (stateCount[s]||0) + 1; }); });
+    const compStates = {};
+    COMPETITORS.forEach(comp => comp.states.split(',').forEach(s => { compStates[s] = (compStates[s]||[]).concat(comp.name); }));
+    const whiteSpaceStates = Object.keys(stateCount).filter(s => !compStates[s]);
+
+    return (
+      <div style={{ padding:24 }}>
+        <Label style={{ color:c.accent }}>COMPETITIVE LANDSCAPE MAP</Label>
+        <div style={{ fontSize:15, color:c.text, marginTop:4, marginBottom:24 }}>Known competitors, partnership networks, white space identification</div>
+
+        <div style={{ display:'grid', gridTemplateColumns:'1fr 340px', gap:20 }}>
+          <div>
+            {COMPETITORS.map((comp, i) => (
+              <Card key={i} style={{ padding:16, marginBottom:10 }}>
+                <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:10 }}>
+                  <div>
+                    <span style={{ fontSize:14, fontWeight:500, color:c.text }}>{comp.name}</span>
+                    <span style={{ marginLeft:8, fontSize:10, padding:'2px 8px', borderRadius:4,
+                      background: comp.threat==='High'?c.hotDim:comp.threat==='Medium'?c.warmDim:c.nurtureDim,
+                      color: comp.threat==='High'?c.hot:comp.threat==='Medium'?c.warm:c.nurture, fontWeight:500 }}>
+                      {comp.threat} Threat
+                    </span>
+                  </div>
+                  <span style={{ fontFamily:mono, fontSize:13, fontWeight:600, color:c.textSecondary }}>{comp.partners} partners</span>
+                </div>
+                <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12, fontSize:11 }}>
+                  <div>
+                    <span style={{ color:c.textMuted }}>Active States: </span>
+                    <span style={{ fontFamily:mono, color:c.textSecondary }}>{comp.states}</span>
+                  </div>
+                  <div>
+                    <span style={{ color:c.textMuted }}>Strength: </span>
+                    <span style={{ color:c.success }}>{comp.strength}</span>
+                  </div>
+                  <div style={{ gridColumn:'1/3' }}>
+                    <span style={{ color:c.textMuted }}>Vulnerability: </span>
+                    <span style={{ color:c.error }}>{comp.weakness}</span>
+                  </div>
+                </div>
+              </Card>
+            ))}
+
+            <Card style={{ padding:16, marginTop:16, borderLeft:`3px solid ${c.accent}` }}>
+              <Label style={{ color:c.accent, marginBottom:8 }}>WHITE SPACE — UNCONTESTED STATES</Label>
+              <div style={{ display:'flex', flexWrap:'wrap', gap:6 }}>
+                {whiteSpaceStates.map(s => (
+                  <span key={s} style={{ padding:'4px 10px', borderRadius:4, background:c.accentDim, border:`1px solid ${c.accentBorder}`, fontFamily:mono, fontSize:12, color:c.accent, fontWeight:500 }}>{s}</span>
+                ))}
+              </div>
+              <div style={{ fontSize:11, color:c.textMuted, marginTop:8 }}>No known managed services competitor active in these prospect states</div>
+            </Card>
+          </div>
+
+          {/* ISPN Positioning */}
+          <div>
+            <Card style={{ padding:16, marginBottom:12 }}>
+              <Label style={{ marginBottom:10 }}>ISPN COMPETITIVE POSITION</Label>
+              {[
+                { label:'FCR Rate', value:'93%', benchmark:'Industry: 72%', advantage:true },
+                { label:'CSAT', value:'90%+', benchmark:'Industry: 78%', advantage:true },
+                { label:'Existing Partnerships', value:'200', benchmark:'Largest competitor: 12', advantage:true },
+                { label:'Agent Capacity', value:'165', benchmark:'Growing', advantage:true },
+                { label:'BEAD Compliance Ready', value:'Yes', benchmark:'Most competitors: No', advantage:true },
+              ].map((m,i) => (
+                <div key={i} style={{ padding:'8px 0', borderBottom:i<4?`1px solid ${c.border}`:'none' }}>
+                  <div style={{ display:'flex', justifyContent:'space-between' }}>
+                    <span style={{ fontSize:12, color:c.textSecondary }}>{m.label}</span>
+                    <span style={{ fontFamily:mono, fontSize:13, fontWeight:600, color:m.advantage?c.accent:c.text }}>{m.value}</span>
+                  </div>
+                  <div style={{ fontSize:10, color:c.textMuted, marginTop:2 }}>{m.benchmark}</div>
+                </div>
+              ))}
+            </Card>
+
+            <Card style={{ padding:16, background:c.accentDim, border:`1px solid ${c.accentBorder}` }}>
+              <Label style={{ color:c.accent, marginBottom:8 }}>STRUCTURAL ADVANTAGE</Label>
+              <div style={{ fontSize:12, color:c.textSecondary, lineHeight:1.6 }}>
+                ISPN's 200-partnership base, 93% FCR, and existing workforce intelligence infrastructure create a compound advantage no competitor can replicate. The platform amplifies this by ensuring ISPN reaches every qualified prospect first.
+              </div>
+            </Card>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // ─── ROADMAP ───
+  const RoadmapView = () => {
+    const phases = [
+      { num:1, name:'Foundation', weeks:'1–4', status:'ready', items:[
+        { task:'Scrape and normalize all BEAD subgrantee data', output:'Master database of 500+ ISPs', effort:'40 hrs' },
+        { task:'Company intelligence enrichment from public sources', output:'Enriched profiles with leadership + contact paths', effort:'30 hrs' },
+        { task:'Initial Operational Strain scoring pass', output:'Scored prospect list ranked by composite index', effort:'20 hrs' },
+        { task:'Deliver scored list to Sales leadership for review', output:'Top 50 qualified prospects with executive briefs', effort:'10 hrs' },
+      ], investment:'80–100 hours + ~$200 API costs', deliverable:'Scored prospect list of 200+ qualified ISPs' },
+      { num:2, name:'Intelligence Engine', weeks:'5–12', status:'pending', items:[
+        { task:'Build Operational Strain Prediction Engine', output:'Six-factor model with automated scoring', effort:'60 hrs' },
+        { task:'Deploy Engagement Orchestration Engine', output:'Claude API-powered contextual outreach briefs', effort:'40 hrs' },
+        { task:'Configure n8n monitoring workflows', output:'Continuous signal detection across 50+ sources', effort:'30 hrs' },
+        { task:'Build React dashboard and deploy to Netlify', output:'Interactive command center for Sales + Leadership', effort:'30 hrs' },
+      ], investment:'160 hours + ~$100/mo ongoing', deliverable:'Predictive scoring + outreach materials for top 50' },
+      { num:3, name:'Full Platform', weeks:'13–20', status:'future', items:[
+        { task:'Deploy five-agent agentic architecture', output:'Autonomous Scout → Analyst → Strategist → Planner → Monitor chain', effort:'80 hrs' },
+        { task:'Build Competitive Landscape Map', output:'Network graph of competitor partnerships and white space', effort:'30 hrs' },
+        { task:'Integrate Capacity Planning Bridge', output:'Pipeline demand feeding WCS forecasting model', effort:'40 hrs' },
+        { task:'Partner Lifecycle Intelligence for existing accounts', output:'Health scoring, churn prediction, expansion detection', effort:'40 hrs' },
+      ], investment:'190 hours + ~$200/mo ongoing', deliverable:'Complete strategic operating system' },
+      { num:4, name:'Optimization', weeks:'21–26', status:'future', items:[
+        { task:'Model calibration from outreach outcomes', output:'Validated factor weights based on conversion data', effort:'Ongoing' },
+        { task:'Financial Intelligence Module', output:'Dynamic contract value modeling + portfolio diversification', effort:'30 hrs' },
+        { task:'Regulatory & Compliance Intelligence', output:'BEAD compliance tracking as sales differentiator', effort:'20 hrs' },
+        { task:'Flywheel feedback loops', output:'Quarterly model performance reports + auto-improvement', effort:'Ongoing' },
+      ], investment:'50+ hours + continuous improvement', deliverable:'Self-improving learning system' },
+    ];
+
+    const active = phases.find(p => p.num === roadmapPhase);
+
+    return (
+      <div style={{ padding:24 }}>
+        <Label style={{ color:c.accent }}>DEPLOYMENT ROADMAP</Label>
+        <div style={{ fontSize:15, color:c.text, marginTop:4, marginBottom:24 }}>Phased deployment from proof-of-value to strategic operating system</div>
+
+        <div style={{ display:'grid', gridTemplateColumns:'280px 1fr', gap:20 }}>
+          {/* Phase Nav */}
+          <div>
+            {phases.map(p => (
+              <button key={p.num} onClick={() => setRoadmapPhase(p.num)} style={{
+                width:'100%', padding:16, marginBottom:10, borderRadius:8, border:`1px solid ${roadmapPhase===p.num?c.accent:c.border}`,
+                background:roadmapPhase===p.num?c.accentDim:c.surface, textAlign:'left', cursor:'pointer', transition:'all 0.2s',
+              }}>
+                <div style={{ display:'flex', alignItems:'center', gap:10 }}>
+                  <div style={{ width:28, height:28, borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center',
+                    background:roadmapPhase===p.num?c.accent:p.status==='ready'?c.accentDim:c.surfaceAlt,
+                    border:`2px solid ${roadmapPhase===p.num?c.accent:c.border}`,
+                    fontFamily:mono, fontSize:12, fontWeight:600, color:roadmapPhase===p.num?c.bg:c.textMuted }}>{p.num}</div>
+                  <div>
+                    <div style={{ fontSize:13, fontWeight:500, color:roadmapPhase===p.num?c.accent:c.text }}>{p.name}</div>
+                    <div style={{ fontSize:10, color:c.textMuted }}>Weeks {p.weeks}</div>
+                  </div>
+                </div>
+              </button>
+            ))}
+
+            <Card style={{ padding:16, marginTop:8, borderLeft:`3px solid ${c.accent}`, background:c.accentDim }}>
+              <Label style={{ color:c.accent, marginBottom:6 }}>THE ASK</Label>
+              <div style={{ fontSize:12, color:c.text, fontWeight:500, lineHeight:1.5 }}>
+                Permission to build Phase 1. 80–100 hours + $200. Proof of value in 4 weeks.
+              </div>
+            </Card>
+          </div>
+
+          {/* Phase Detail */}
+          {active && (
+            <div>
+              <Card style={{ padding:20, marginBottom:12 }}>
+                <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:16 }}>
+                  <div>
+                    <div style={{ fontFamily:mono, fontSize:20, fontWeight:600, color:c.accent }}>Phase {active.num}: {active.name}</div>
+                    <div style={{ fontSize:12, color:c.textMuted, marginTop:2 }}>Weeks {active.weeks}</div>
+                  </div>
+                  <span style={{ padding:'4px 10px', borderRadius:4, fontSize:10, fontWeight:600,
+                    background: active.status==='ready'?c.accentDim:active.status==='pending'?c.warmDim:c.surfaceAlt,
+                    color: active.status==='ready'?c.accent:active.status==='pending'?c.warm:c.textMuted,
+                    border:`1px solid ${active.status==='ready'?c.accentBorder:active.status==='pending'?`${c.warm}33`:c.border}`,
+                    textTransform:'uppercase', letterSpacing:'0.05em' }}>
+                    {active.status==='ready'?'READY TO START':active.status==='pending'?'PENDING PHASE 1':'FUTURE'}
+                  </span>
+                </div>
+
+                {active.items.map((item, i) => (
+                  <div key={i} style={{ padding:14, marginBottom:8, borderRadius:6, background:c.bg, border:`1px solid ${c.border}` }}>
+                    <div style={{ fontSize:13, color:c.text, fontWeight:500, marginBottom:4 }}>{item.task}</div>
+                    <div style={{ display:'flex', justifyContent:'space-between', fontSize:11 }}>
+                      <span style={{ color:c.textMuted }}>Output: <span style={{ color:c.accent }}>{item.output}</span></span>
+                      <span style={{ fontFamily:mono, color:c.textMuted }}>{item.effort}</span>
+                    </div>
+                  </div>
+                ))}
+              </Card>
+
+              <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
+                <Card style={{ padding:16, textAlign:'center' }}>
+                  <Label>INVESTMENT</Label>
+                  <div style={{ fontFamily:mono, fontSize:14, fontWeight:500, color:c.text, marginTop:6 }}>{active.investment}</div>
+                </Card>
+                <Card style={{ padding:16, textAlign:'center' }}>
+                  <Label>DELIVERABLE</Label>
+                  <div style={{ fontSize:12, fontWeight:500, color:c.accent, marginTop:6, lineHeight:1.4 }}>{active.deliverable}</div>
+                </Card>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  // ═══ RENDER ═══
+  const views = { command: CommandCenter, pipeline: PipelineView, strain: StrainSim, financial: FinancialModel, agents: AgentView, compete: CompetitiveMap, roadmap: RoadmapView };
+  const ActiveView = views[view];
+
+  return (
+    <div style={{ minHeight:'100vh', background:c.bg, fontFamily:sans, color:c.text }}>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: ${c.bg}; }
+        ::-webkit-scrollbar-thumb { background: ${c.border}; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: ${c.textMuted}; }
+        input[type="range"] { -webkit-appearance: none; appearance: none; outline: none; }
+        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 16px; height: 16px; border-radius: 50%; background: ${c.accent}; cursor: pointer; border: 2px solid ${c.bg}; box-shadow: 0 0 0 1px ${c.accent}; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+        tr:hover { background: ${c.surfaceAlt} !important; }
+        button:hover { opacity: 0.85; }
+      `}</style>
+
+      {/* ─── TOP HEADER ─── */}
+      <header style={{ borderBottom:`1px solid ${c.border}`, padding:'0 24px', display:'flex', justifyContent:'space-between', alignItems:'center', height:56 }}>
+        <div style={{ display:'flex', alignItems:'center', gap:16 }}>
+          <div>
+            <div style={{ fontSize:10, letterSpacing:'0.12em', color:c.accent, fontWeight:500 }}>BROADBAND PARTNER INTELLIGENCE</div>
+            <div style={{ fontSize:16, fontWeight:400, letterSpacing:'-0.01em', color:c.text }}>Strategic Operating System</div>
+          </div>
+        </div>
+        <div style={{ display:'flex', gap:32, alignItems:'baseline' }}>
+          <div>
+            <span style={{ fontFamily:mono, fontSize:22, fontWeight:600, color:c.accent }}>{fmt(totalMarket)}</span>
+            <span style={{ fontSize:11, color:c.textMuted, marginLeft:6 }}>addressable market</span>
+          </div>
+          <div>
+            <span style={{ fontFamily:mono, fontSize:22, fontWeight:600, color:c.text }}>500+</span>
+            <span style={{ fontSize:11, color:c.textMuted, marginLeft:6 }}>funded ISPs</span>
+          </div>
+          <div>
+            <span style={{ fontFamily:mono, fontSize:22, fontWeight:600, color:c.warning }}>{PROSPECTS.filter(p=>p.tier==='hot').length}</span>
+            <span style={{ fontSize:11, color:c.textMuted, marginLeft:6 }}>critical prospects</span>
+          </div>
+          <div style={{ display:'flex', alignItems:'center', gap:6, padding:'4px 10px', borderRadius:4, background:'rgba(74,222,128,0.08)', border:'1px solid rgba(74,222,128,0.2)' }}>
+            <span style={{ width:6, height:6, borderRadius:'50%', background:c.success, animation:'pulse 2s infinite' }} />
+            <span style={{ fontSize:10, fontWeight:500, color:c.success }}>AGENTS ONLINE</span>
+          </div>
+        </div>
+      </header>
+
+      {/* ─── NAV + CONTENT ─── */}
+      <div style={{ display:'grid', gridTemplateColumns:'220px 1fr', minHeight:'calc(100vh - 56px)' }}>
+        {/* Sidebar */}
+        <nav style={{ borderRight:`1px solid ${c.border}`, padding:'16px 0', background:c.surface }}>
+          {NAV.map(n => (
+            <button key={n.id} onClick={() => { setView(n.id); if(n.id!=='pipeline') setSelectedId(null); }} style={{
+              width:'100%', padding:'10px 20px', display:'flex', alignItems:'center', gap:10,
+              background:view===n.id?c.accentDim:'transparent', border:'none', borderLeft:`3px solid ${view===n.id?c.accent:'transparent'}`,
+              color:view===n.id?c.accent:c.textSecondary, cursor:'pointer', fontSize:12, fontWeight:view===n.id?500:400, textAlign:'left',
+              transition:'all 0.15s',
+            }}>
+              <span style={{ fontFamily:mono, fontSize:14, width:20, textAlign:'center', opacity:view===n.id?1:0.5 }}>{n.icon}</span>
+              {n.label}
+            </button>
+          ))}
+
+          {/* Money Line */}
+          <div style={{ margin:'20px 16px', padding:14, borderRadius:6, background:c.bg, border:`1px solid ${c.border}` }}>
+            <div style={{ fontSize:9, fontWeight:500, letterSpacing:'0.1em', color:c.accent, textTransform:'uppercase', marginBottom:6 }}>THE MONEY LINE</div>
+            <div style={{ fontSize:11, color:c.textSecondary, lineHeight:1.5, fontStyle:'italic' }}>
+              "$48B in broadband funding just created 500+ ISPs that need what we sell. This platform gets us there first."
+            </div>
+          </div>
+
+          <div style={{ margin:'12px 16px', padding:10, borderRadius:6, borderLeft:`2px solid ${c.accent}`, background:c.accentDim }}>
+            <div style={{ fontSize:9, fontWeight:500, letterSpacing:'0.1em', color:c.textMuted, textTransform:'uppercase', marginBottom:3 }}>DESIGNED BY</div>
+            <div style={{ fontSize:12, color:c.text, fontWeight:500 }}>Pete Connor</div>
+            <div style={{ fontSize:10, color:c.textMuted }}>Director, TC Operations</div>
+          </div>
+        </nav>
+
+        {/* Main Content */}
+        <main style={{ overflowY:'auto', maxHeight:'calc(100vh - 56px)' }}>
+          <ActiveView />
+        </main>
+      </div>
+    </div>
+  );
+}
